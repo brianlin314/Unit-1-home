@@ -52,26 +52,21 @@ class C3D(nn.Module):
 
         x = self.relu(self.bn1(self.conv1(x)))
         x = self.pool1(x)
-        # print(x.shape)
 
         x = self.relu(self.bn2(self.conv2(x)))
         x = self.pool2(x)
-        # print(x.shape)
 
         x = self.relu(self.bn3(self.conv3a(x)))
         x = self.relu(self.bn3(self.conv3b(x)))
         x = self.pool3(x)
-        # print(x.shape)
 
         x = self.relu(self.bn4(self.conv4a(x)))
         x = self.relu(self.bn4(self.conv4b(x)))
         x = self.pool4(x)
-        # print(x.shape)
 
         # x = self.relu(self.bn5(self.conv5a(x)))
         # x = self.relu(self.bn5(self.conv5b(x)))
         # x = self.pool5(x)
-        # print(x.shape)
 
         x = torch.reshape(x, (x.shape[0], x.shape[1]*x.shape[2], x.shape[3], x.shape[4]))
       
@@ -91,47 +86,6 @@ class C3D(nn.Module):
         return logits
 
     def __load_pretrained_weights(self):
-        """Initialiaze network."""
-        # corresp_name = {
-        #                 # Conv1
-        #                 "features.0.weight": "conv1.weight",
-        #                 "features.0.bias": "conv1.bias",
-        #                 # Conv2
-        #                 "features.3.weight": "conv2.weight",
-        #                 "features.3.bias": "conv2.bias",
-        #                 # Conv3a
-        #                 "features.6.weight": "conv3a.weight",
-        #                 "features.6.bias": "conv3a.bias",
-        #                 # Conv3b
-        #                 "features.8.weight": "conv3b.weight",
-        #                 "features.8.bias": "conv3b.bias",
-        #                 # Conv4a
-        #                 "features.11.weight": "conv4a.weight",
-        #                 "features.11.bias": "conv4a.bias",
-        #                 # Conv4b
-        #                 "features.13.weight": "conv4b.weight",
-        #                 "features.13.bias": "conv4b.bias",
-        #                 # Conv5a
-        #                 "features.16.weight": "conv5a.weight",
-        #                 "features.16.bias": "conv5a.bias",
-        #                  # Conv5b
-        #                 "features.18.weight": "conv5b.weight",
-        #                 "features.18.bias": "conv5b.bias",
-        #                 # fc6
-        #                 "classifier.0.weight": "fc6.weight",
-        #                 "classifier.0.bias": "fc6.bias",
-        #                 # fc7
-        #                 "classifier.3.weight": "fc7.weight",
-        #                 "classifier.3.bias": "fc7.bias",
-        #                 }
-
-        # p_dict = torch.load(Path.model_dir())
-        # s_dict = self.state_dict()
-        # for name in p_dict:
-        #     if name not in corresp_name:
-        #         continue
-        #     s_dict[corresp_name[name]] = p_dict[name]
-        # self.load_state_dict(s_dict)
         s_dict = self.state_dict()
         for name in s_dict:
             print(name)
@@ -140,8 +94,6 @@ class C3D(nn.Module):
     def __init_weight(self):
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
-                # n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                # m.weight.data.normal_(0, math.sqrt(2. / n))
                 torch.nn.init.kaiming_normal_(m.weight)
             elif isinstance(m, nn.BatchNorm3d):
                 m.weight.data.fill_(1)
@@ -167,10 +119,3 @@ def get_10x_lr_params(model):
         for k in b[j].parameters():
             if k.requires_grad:
                 yield k
-
-if __name__ == "__main__":
-    inputs = torch.rand(4, 1, 512, 64, 64)
-    net = C3D(num_classes=4, pretrained=True)
-
-    outputs = net.forward(inputs)
-    print(outputs.size())

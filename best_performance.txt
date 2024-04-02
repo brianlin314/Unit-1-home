@@ -1,0 +1,13 @@
+Seed: 0 Best Performance: 0.6463414634146342
+Seed: 0 Best Performance: 0.703125
+Seed: 13 Best Performance: 0.6759581881533101
+Seed: 13 Best Performance: 0.734375
+Seed: 16 Best Performance: 0.7160278745644599
+Seed: 16 Best Performance: 0.703125
+Seed: 35 Best Performance: 0.6550522648083623
+Seed: 35 Best Performance: 0.671875
+Seed: 43 Best Performance: 0.65625
+Seed: 44 Best Performance: 0.6846689895470384
+Seed: 44 Best Performance: 0.734375
+Seed: 48 Best Performance: 0.6376306620209059
+Seed: 48 Best Performance: 0.671875

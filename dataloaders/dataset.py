@@ -47,11 +47,11 @@ class VideoDataset(Dataset):
                 labels.append(label)
 
         assert len(labels) == len(self.fnames)  # 每個file name都有自己的label
-        print('Number of {} videos: {:d}'.format(split, len(self.fnames)))
+        # print('Number of {} videos: {:d}'.format(split, len(self.fnames)))
 
         # Prepare a mapping between the label names (strings) and indices (ints)
         self.label2index = {label: index for index, label in enumerate(sorted(set(labels)))}     # 每個label有自己的index 用dictionary的方式儲存 （ex:{'SSH':1, 'goldeneye':2, ...}）
-        print("label2index:", self.label2index)
+        # print("label2index:", self.label2index)
         # Convert the list of label names into an array of label indices
         self.label_array = np.array([self.label2index[label] for label in labels], dtype=int)      # 每個label有自己的index 用array的方式儲存 （ex:['SSH', 'goldeneye', ...]）
 

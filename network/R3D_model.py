@@ -140,14 +140,14 @@ class R3DNet(nn.Module):
         super(R3DNet, self).__init__()
 
         # first conv, with stride 1x2x2 and kernel size 3x7x7
-        self.conv1 = SpatioTemporalConv(1, 64, [3, 7, 7], stride=[1, 2, 2], padding=[1, 3, 3])
+        self.conv1 = SpatioTemporalConv(3, 64, [3, 7, 7], stride=[1, 2, 2], padding=[1, 3, 3])
         # output of conv2 is same size as of conv1, no downsampling needed. kernel_size 3x3x3
-        self.conv2 = SpatioTemporalResLayer(64, 64, 1, layer_sizes[0], block_type=block_type)
+        self.conv2 = SpatioTemporalResLayer(64, 64, 3, layer_sizes[0], block_type=block_type)
         # each of the final three layers doubles num_channels, while performing downsampling
         # inside the first block
-        self.conv3 = SpatioTemporalResLayer(64, 128, 1, layer_sizes[1], block_type=block_type, downsample=True)
-        self.conv4 = SpatioTemporalResLayer(128, 256, 1, layer_sizes[2], block_type=block_type, downsample=True)
-        self.conv5 = SpatioTemporalResLayer(256, 512, 1, layer_sizes[3], block_type=block_type, downsample=True)
+        self.conv3 = SpatioTemporalResLayer(64, 128, 3, layer_sizes[1], block_type=block_type, downsample=True)
+        self.conv4 = SpatioTemporalResLayer(128, 256, 3, layer_sizes[2], block_type=block_type, downsample=True)
+        self.conv5 = SpatioTemporalResLayer(256, 512, 3, layer_sizes[3], block_type=block_type, downsample=True)
         self.conv6 = nn.Conv2d(16384, 256, [1, 1], stride=[1, 1], padding=[1, 1])
         # global average pooling of the output
         self.pool = nn.AdaptiveAvgPool3d(8)
@@ -236,11 +236,3 @@ def get_10x_lr_params(model):
         for k in b[j].parameters():
             if k.requires_grad:
                 yield k
-
-if __name__ == "__main__":
-    import torch
-    inputs = torch.rand(1, 1, 512, 64, 64)
-    net = R3DClassifier(4, (2, 2, 2, 2), pretrained=True)
-
-    outputs = net.forward(inputs)
-    print(outputs.shape)

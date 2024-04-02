@@ -336,7 +336,7 @@ class Pac3DNet(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        # print(x.shape)
+        # print("conv1:", x.shape)
         # x = self.conv2(x)
         x = self.conv3(x)
         # print(x.shape)
@@ -424,7 +424,7 @@ def get_10x_lr_params(model):
 
 if __name__ == "__main__":
     import torch
-    inputs = torch.rand(4, 1, 512, 64, 64)
+    inputs = torch.rand(4, 3, 512, 64, 64)
     net = Pac3DClassifier(4, (2, 2, 2, 2), pretrained=True)
 
     outputs = net.forward(inputs)
