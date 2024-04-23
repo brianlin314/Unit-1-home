@@ -22,9 +22,15 @@ class VideoDataset(Dataset):
     """
 
     def __init__(self, split='train', dataset='CIC-IDS2018', clip_len=16, preprocess=False):
-        self.root_dir, self.output_dir = Path.db_dir(dataset)
-        folder = os.path.join(self.output_dir, split)
-        self.split = split
+        if split == 'train' or split == 'val' or split == 'test':
+            self.root_dir, self.output_dir = Path.db_dir(dataset)
+            folder = os.path.join(self.output_dir, split)
+            self.split = split
+
+        elif split == 'all':
+            self.root_dir, self.output_dir = Path.db_dir(dataset)
+            folder = self.root_dir
+            print("folder:", folder)
 
         self.clip_len = clip_len
         self.resize_height = 64

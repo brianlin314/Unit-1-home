@@ -319,13 +319,6 @@ class Pac3DNet(nn.Module):
 
     def __init__(self, layer_sizes, block_type=R3DResBlock):
         super(Pac3DNet, self).__init__()
-
-        # self.conv1 = R3DConv(3, 64, [3, 7, 7], stride=[1, 2, 2], padding=[1, 3, 3])
-        # self.conv2 = R3DResLayer(64, 128, 1, layer_sizes[1], block_type=R3DResBlock, downsample=True)
-        # self.conv3 = R2Plus1DResLayer(128, 256, 1, layer_sizes[2], block_type=R2Plus1DResBlock, downsample=True)
-        # self.conv4 = R2Plus1DConv(256, 128, [1, 3, 3], stride=[1, 2, 2], padding=[1, 3, 3])
-        # self.conv5 = nn.Conv2d(8448, 64, [1, 1], stride=[1, 1], padding=[1, 1])
-
         self.conv1 = R2Plus1DConv(3, 64, [3, 7, 7], stride=[1, 2, 2], padding=[1, 3, 3])
         self.conv2 = R2Plus1DResLayer(64, 128, 1, layer_sizes[0], block_type=R2Plus1DResBlock, downsample=True)
         self.conv3 = R3DResLayer(128, 256, 1, layer_sizes[1], block_type=R3DResBlock, downsample=True)
@@ -333,32 +326,17 @@ class Pac3DNet(nn.Module):
         self.conv5 = nn.Conv2d(8448, 64, [1, 1], stride=[1, 1], padding=[1, 1])
         self.pool = nn.AdaptiveAvgPool2d(8)
 
-        # self.conv2 = R2Plus1DConv(64, 128, [3, 3, 3], stride=[1, 2, 2], padding=[1, 3, 3])
-        # self.conv3 = R2Plus1DResLayer(128, 128, 1, layer_sizes[1], block_type=R2Plus1DResBlock, downsample=True)
-        # self.conv4 = R3DResLayer(128, 256, 1, layer_sizes[2], block_type=R2Plus1DResBlock, downsample=True)
-        # self.conv1 = R3DConv(3, 64, [3, 3, 3], stride=[1, 2, 2], padding=[1, 3, 3])
-        # self.conv5 = nn.Conv2d(16384, 64, [1, 1], stride=[1, 1], padding=[1, 1])
-        # self.pool = nn.AdaptiveAvgPool2d(8)
 
     def forward(self, x):
         x = self.conv1(x)
-        # print("conv1:", x.shape)
-        # x = self.conv2(x)
         x = self.conv2(x)
-        # print(x.shape)
         x = self.conv3(x)
-        # print(x.shape)
         x = self.conv4(x)
-        # print(x.shape)
         x = torch.reshape(x, (x.shape[0], x.shape[1]*x.shape[2], x.shape[3], x.shape[4]))
-        # print(x.shape)
         x = self.conv5(x)
-        # print(x.shape)
         x = self.pool(x)
-        # print(x.shape)
         
         return x.view(-1, 4096)
-
 
 class Pac3DClassifier(nn.Module):
     r"""Forms a complete ResNet classifier producing vectors of size num_classes, by initializng 5 layers,
@@ -377,7 +355,7 @@ class Pac3DClassifier(nn.Module):
 
         self.res3d = Pac3DNet(layer_sizes, block_type)
         self.linear = nn.Linear(4096, 1024)
-        self.linear2 = nn.Linear(1024,  256)
+        self.linear2 = nn.Linear(1024, 256)
         self.linear3 = nn.Linear(256, num_classes)
 
         self.__init_weight()
@@ -385,9 +363,11 @@ class Pac3DClassifier(nn.Module):
         if pretrained:
             self.__load_pretrained_weights()
 
-    def forward(self, x):
+    def forward(self, x, extract_features=False):
         x = self.res3d(x)
         x = self.linear(x)
+        if extract_features:
+            return self.linear2(x)  # 返回256维特徵
         x = self.linear2(x)
         logits = self.linear3(x)
         return logits
