@@ -1,11 +1,14 @@
 import os
 import numpy as np
 import torch
+import re
 from torch.utils.data import DataLoader
-from dataloaders.dataset import VideoDataset
+from dataloaders.dataset_feature import VideoDataset
 from network.Pac3D_model import Pac3DClassifier
 
+
 def save_features(attack_type, subfolder):
+    print(f"Extracting features from {attack_type}/{subfolder}...")
     num_classes_dict = {
         "DDoS": 3, "DoS": 4, "Web": 3, "Auth": 2, "Other": 2
     }
@@ -16,21 +19,14 @@ def save_features(attack_type, subfolder):
         "Auth": '/SSD/p76111262/model_weight/Pac3D_run21.pth',
         "Other": '/SSD/p76111262/model_weight/Pac3D_run23.pth'
     }
-    dataset_path_dict = {
-        "DDoS": "CIC-IDS2018-v3-DDoS",
-        "DoS": "CIC-IDS2018-v3-DoS",
-        "Web": "CIC-IDS2018-v3-Web",
-        "Auth": "CIC-IDS2018-v3-Auth",
-        "Other": "CIC-IDS2018-v3-Other"
-    }
     
     num_classes = num_classes_dict[attack_type]
     model_path = model_path_dict[attack_type]
-    dataset_path = os.path.join("/path/to/Auth", subfolder)
+    dataset_path = os.path.join("/SSD/p76111262/CIC-IDS-2018-v3", attack_type, subfolder)
 
     model = Pac3DClassifier(num_classes, layer_sizes=(2, 2))
     model.load_state_dict(torch.load(model_path))
-    model.eval()  # 设置模型为评估模式
+    model.eval() 
 
     if torch.cuda.is_available():
         device = torch.device("cuda")
@@ -40,16 +36,26 @@ def save_features(attack_type, subfolder):
     model.eval()
     model = model.to(device)
 
-    dataloader = DataLoader(VideoDataset(dataset_path, split='all', clip_len=256), batch_size=1, shuffle=False)
+    dataloader = DataLoader(VideoDataset(dataset=dataset_path, clip_len=256), batch_size=1, shuffle=False)
 
-    features = []
-    with torch.no_grad():  
-        for inputs, _ in dataloader:  
+    data_size = len(dataloader.dataset)
+    print("data_size:", data_size)
+    feature_dimension = 256
+
+    features = np.zeros((data_size, feature_dimension))
+
+    with torch.no_grad():
+        for inputs, indices in dataloader:
+            numeric_indices = [int(re.search(r'\d+', index).group()) for index in indices]
+            print("numeric indices:", numeric_indices)
+
             inputs = inputs.to(device)
-            feature = model(inputs, extract_features=True) 
-            features.append(feature.cpu().numpy()) 
-    
-    np.save(f"/SSD/p76111262/visual_embedding/{subfolder}.npy", np.concatenate(features, axis=0))         
+            output_features = model(inputs, extract_features=True) 
+            output_features = output_features.cpu().numpy()
+            features[numeric_indices[0] - 1] = output_features
+
+    np.save(f"/SSD/p76111262/visual_embedding/{subfolder}.npy", features)
+
     return features
 
 if __name__ == '__main__':

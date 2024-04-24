@@ -27,11 +27,6 @@ class VideoDataset(Dataset):
             folder = os.path.join(self.output_dir, split)
             self.split = split
 
-        elif split == 'all':
-            self.root_dir, self.output_dir = Path.db_dir(dataset)
-            folder = self.root_dir
-            print("folder:", folder)
-
         self.clip_len = clip_len
         self.resize_height = 64
         self.resize_width = 64
@@ -126,6 +121,7 @@ class VideoDataset(Dataset):
     def load_frames(self, file_dir):
         frames = sorted([os.path.join(file_dir, img) for img in os.listdir(file_dir)], key=lambda x: int(x.split('/')[-1].split('.')[0]))
         frame_count = len(frames)
+        print("frames:", frames)
 
         frames_to_load = frames[:self.clip_len] if frame_count >= self.clip_len else frames
         buffer = np.empty((len(frames_to_load), self.resize_height, self.resize_width, 3), np.dtype('float32')) 
