@@ -16,7 +16,8 @@ def view_npy_file(file_path):
     return data
 
 # Example usage
-file_path = "/SSD/p76111262/visual_embedding/DDoS_HOIC.npy"  # Replace with the path to your .npy file
+# file_path = "/SSD/p76111262/visual_embedding/DDoS_HOIC.npy"  # Replace with the path to your .npy file
+file_path = "/SSD/p76111262/label_embedding/BruteForce-Web.npy" 
 n = view_npy_file(file_path)
 # print(n.shape)
-print(n[193])
+print(n)

@@ -118,8 +118,8 @@ def packet_encoder(pcap_path, img_output_path):
         plt.imsave(pkt_fig_name, matrix, cmap='gray', vmin=0, vmax=255) # 將矩陣保存為圖片
 
 if __name__ == "__main__":
-    source_folder = './splited_pcap/'
-    output_folder = './CIC-IDS-2018-imgs/'
+    source_folder = '/SSD/p76111262/splited_pcap/'
+    output_folder = '/SSD/p76111262/CIC-IDS-2018-v1/'
     
     copy_subdirectories_only_if_not_exist(source_folder, output_folder)
     process_pcap_files(source_folder, output_folder)   

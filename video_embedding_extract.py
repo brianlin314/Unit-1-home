@@ -39,7 +39,6 @@ def save_features(attack_type, subfolder):
     dataloader = DataLoader(VideoDataset(dataset=dataset_path, clip_len=256), batch_size=1, shuffle=False)
 
     data_size = len(dataloader.dataset)
-    print("data_size:", data_size)
     feature_dimension = 256
 
     features = np.zeros((data_size, feature_dimension))
