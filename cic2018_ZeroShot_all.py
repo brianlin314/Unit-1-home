@@ -76,17 +76,12 @@ def read_data(file_path):
 
     return df
 
-def delete_attack(df, attack_name):
-    df = df[df['Label'] != attack_name]
-    print("現在的攻擊類別有：", df['Label'].unique())
-    return df
-
 def train(df, num_epochs):
     set_seed(42)
 
     label_embeddings_dict = label_to_vector(df) # label_embeeings 是一個字典，{"DDoS": [0.1, 0.2, ...], "PortScan": [0.3, 0.4, ...], ...} 
     key_index_dict = label_to_index(label_embeddings_dict) # key_index_dict 是一個字典，{"DDoS": 0, "PortScan": 1, ...}
-
+    print("key_index_dict:", key_index_dict)
     X = df.drop('Label', axis=1) # 資料特徵
     y = df['Label'] # 目標 label 
 
@@ -101,7 +96,6 @@ def train(df, num_epochs):
 
     input_size = X_scaled.shape[1] # 特徵向量的維度
     output_size = y_vectors.shape[1]  # label embedding 的維度
-
 
     model = Model(input_size, output_size)
     # criterion = nn.MSELoss()
@@ -134,7 +128,7 @@ def train(df, num_epochs):
             predicted_labels = np.argmax(similarities, axis=1)
             accuracy = np.mean(predicted_labels == y_test_label)
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}, Accuracy: {accuracy:.4f}')
-
+        
 if __name__ == '__main__':
     num_epochs = 100
     csv_file_path = '/SSD/p76111262/CIC2018_csv/preprocess_attack.csv'
