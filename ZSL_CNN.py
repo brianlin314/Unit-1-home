@@ -11,10 +11,11 @@ import random
 import joblib
 import math
 from sklearn.metrics import roc_curve
-from model import DeepAutoEncoder, SimpleMLP
+from model import DeepAutoEncoder, SimpleMLP, SimpleCNN, CNNLSTM, SimpleLSTM, SimpleGRU, SimpleRNN
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, top_k_accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+import itertools
 
 # 固定亂數種子
 def set_seed(seed):
@@ -105,7 +106,7 @@ def train_AE(seen_df, unseen_df, num_epochs=100, batch_size=64, AE_model="DeepAu
         model = DeepAutoEncoder(X_train.shape[1])
         criterion = nn.MSELoss()
     else:
-        print("Model not found")
+        print("AE Model not found")
         return
     
     optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -128,7 +129,7 @@ def train_AE(seen_df, unseen_df, num_epochs=100, batch_size=64, AE_model="DeepAu
             loss += loss.item()
         
         training_loss.append(loss)
-        if epoch % 5 == 0:
+        if (epoch + 1) % 5 == 0:
             print(f'Epoch {epoch+1}/{EPOCHS}, Loss: {loss}')
         save_model = '/SSD/p76111262/model_weight/CIC_AE.pth'
         torch.save(model, save_model)
@@ -174,7 +175,7 @@ def train_AE(seen_df, unseen_df, num_epochs=100, batch_size=64, AE_model="DeepAu
     print("-------訓練 AutoEncoder 完成-------")
     return model, round_optimal_threshold
 
-def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None, label_embeddings_path=None, num_epochs=100):
+def train_classifier(seen_df, classify_model="SimpleCNN", seen_attack_list=None, label_embeddings_path=None, num_epochs=100):
     label_embeddings_dict = label_to_embeddings(seen_attack_list, label_embeddings_path) # label_embeeings 是一個字典，{"DDoS": [DDoS_embeddings], "DoS": [DoS_embeddings], ...} 
     key_index_dict = label_to_index(label_embeddings_dict) # key_index_dict 是一個字典，{"DDoS": 0, "PortScan": 1, ...}
 
@@ -182,27 +183,30 @@ def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None,
     y = seen_df['Label'] # 目標 label 
 
     # 將原先的 Label 都轉換為對應的 label embeddings，y_embeddings 裡面有一堆攻擊對應的向量
-    y_embeddings = [] 
-    for label in y:
-        y_embeddings.append(label_embeddings_dict[label])
-    y_embeddings = np.array(y_embeddings)
+    y_embeddings = np.array([label_embeddings_dict[label] for label in y])
 
-    input_size = X.shape[1] # 特徵向量的維度
-    output_size = y_embeddings.shape[1]  # label embedding 的維度
-
-    if classify_model == "SimpleMLP":
-        model = SimpleMLP(input_size, output_size)
+    if classify_model == "SimpleCNN":
+        model = SimpleCNN()
+        criterion = nn.CosineEmbeddingLoss()
+    elif classify_model == "CNN-LSTM":
+        model = CNNLSTM()
+        criterion = nn.CosineEmbeddingLoss()
+    elif classify_model == "SimpleLSTM":
+        model = SimpleLSTM(input_size=78, hidden_size=64, num_layers=1)
+        criterion = nn.CosineEmbeddingLoss()
+    elif classify_model == "SimpleGRU":
+        model = SimpleGRU(input_size=78, hidden_size=64, num_layers=1)
+        criterion = nn.CosineEmbeddingLoss()
+    elif classify_model == "SimpleRNN":
+        model = SimpleRNN(input_size=78, hidden_size=64, num_layers=5)
         criterion = nn.CosineEmbeddingLoss()
     else:
-        print("Model not found")
+        print("Classify Model not found")
         return
+    
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y_embeddings, test_size=0.2, random_state=42)
-
-    # 將 unseen attack 加入到 test data 中
-    # X_test = np.concatenate([X_test, X_unseen], axis=0)
-    # y_test = np.concatenate([y_test, y_unseen_embeddings], axis=0)   
 
     # 即 label 的 index，例如 [1, 4, 2, 3, 0, 1, 2, 3, 4, 0, ...]
     y_test_label = [] 
@@ -211,9 +215,9 @@ def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None,
             if np.array_equal(value, item):
                 y_test_label.append(key_index_dict[key])
 
-    X_train_tensor = torch.tensor(X_train.values, dtype=torch.float32)
+    X_train_tensor = torch.tensor(X_train.to_numpy().reshape(-1, 1, 78), dtype=torch.float32)  # (batch_size, channels, features)，-1 會自動計算 batch_size
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-    X_test_tensor = torch.tensor(X_test.values, dtype=torch.float32)
+    X_test_tensor = torch.tensor(X_test.to_numpy().reshape(-1, 1, 78), dtype=torch.float32)
 
     ### Training ###
     for epoch in range(num_epochs):
@@ -223,7 +227,7 @@ def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None,
         loss = criterion(outputs, y_train_tensor, torch.ones(len(y_train), dtype=torch.float32)) 
         loss.backward()
         optimizer.step()
-        if epoch % 5 == 0:
+        if (epoch+1) % 5 == 0:
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 
     torch.save(model, '/SSD/p76111262/model_weight/CIC_classifier.pth')
@@ -257,7 +261,6 @@ def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model
     all_label_embeddings_dict = {**seen_label_embeddings_dict, **unseen_label_embeddings_dict}
     label_names = list(all_label_embeddings_dict.keys())
     all_key_index_dict = {**seen_key_index_dict, **unseen_key_index_dict}
-    print("all_label_embeddings_dict: ", all_label_embeddings_dict)
     print("label_names: ", label_names)
     print("all_key_index_dict: ", all_key_index_dict)
 
@@ -301,18 +304,20 @@ def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model
 
             error = torch.mean(torch.square(AE_outputs - data), dim=1)
             if error > threshold:
+                data = data.reshape(-1, 1, 78)
                 classify_output = classify_model(data)
                 similarities = cosine_similarity(classify_output.cpu().numpy(), list(unseen_label_embeddings_dict.values()))
                 predicted_label = np.argmax(similarities)
                 predicted_label_list.append(predicted_label + num)
             else:
+                data = data.reshape(-1, 1, 78)
                 classify_output = classify_model(data)
                 similarities = cosine_similarity(classify_output.cpu().numpy(), list(seen_label_embeddings_dict.values()))
                 predicted_label = np.argmax(similarities)
                 predicted_label_list.append(predicted_label)
         
-        # print("y_test_label: ", y_test_label)
-        # print("predicted_label_list: ", predicted_label_list)
+        print("y_test_label: ", y_test_label)
+        print("predicted_label_list: ", predicted_label_list)
         accuracy = accuracy_score(y_test_label, predicted_label_list)
         precision = precision_score(y_test_label, predicted_label_list, average='weighted')
         recall = recall_score(y_test_label, predicted_label_list, average='weighted')
@@ -330,20 +335,67 @@ def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model
         plt.xlabel('Predicted Labels')
         plt.ylabel('True Labels')
         plt.title('Confusion Matrix')
-        plt.savefig('confusion_matrix.png')
+        plt.savefig(f'pictures/{unseen_attack_list[0]}and{unseen_attack_list[1]}.png')
+
+        return accuracy, precision, recall, f1
+
+def Permutations(attack_types):
+    combinations = list(itertools.combinations(attack_types, 2))
+    result = []
+
+    for combo in combinations:
+        two_unseens = list(combo)
+        seens = [attack for attack in attack_types if attack not in two_unseens]
+        
+        result.append({
+            'unseen_attack_name': two_unseens,
+            'seen_attack_name': seens
+        })
+
+    return result
 
 set_seed(42) # 設置隨機種子
 device = cuda_available()
 if __name__ == '__main__':
     AE_num_epochs = 100
     AE_batch_size = 64
-    classify_num_epochs = 100
+    classify_num_epochs = 150
+    AE_model = "DeepAutoEncoder"
+    classify_model = "SimpleRNN"
     csv_file_path = '/SSD/p76111262/CIC2018_csv/preprocess_attack.csv'
     label_embeddings_path = '/SSD/p76111262/label_embedding_32'
 
-    # DDoS and DoS attacks
-    seen_attack_name = ['DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_GoldenEye']
-    unseen_attack_name = ['DDoS_HOIC', 'DoS_Hulk']
+    attack_types = [
+    'DDoS_LOIC-HTTP', 'DDoS_HOIC', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_Hulk', 'DoS_GoldenEye',
+    'BruteForce-XSS', 'BruteForce-Web', 'SQL-Injection', 'BruteForce-SSH', 'BruteForce-FTP', 'Infiltration', 'Botnet'
+    ]
+    combinations = Permutations(attack_types)
+
+    with open(f"{classify_model}_best_com.txt", 'w') as f:
+        for idx, item in enumerate(combinations):
+            seen_attack_name = item['seen_attack_name']
+            unseen_attack_name = item['unseen_attack_name']
+            print(f"unseen attacks: {item['unseen_attack_name']}")
+            print(f"seen attacks: {item['seen_attack_name']}")
+            f.write(f"unseen attacks: {item['unseen_attack_name']}\n")
+        
+            seen_attack_df, unseen_attack_df = read_data(csv_file_path, seen_attack_name, unseen_attack_name)
+            seen_attack_df_AE = seen_attack_df.copy()
+            seen_attack_df_eval = seen_attack_df.copy()
+            unseen_attack_df_eval = unseen_attack_df.copy()
+
+            Trained_AE_model, best_threshold = train_AE(seen_attack_df, unseen_attack_df, AE_num_epochs, AE_batch_size, AE_model=AE_model)      
+            Trained_classify_model = train_classifier(seen_attack_df_AE, classify_model=classify_model, seen_attack_list=seen_attack_name, label_embeddings_path=label_embeddings_path, num_epochs=classify_num_epochs)
+            accuracy, precision, recall, f1 = evaluate(seen_attack_df_eval, unseen_attack_df_eval, threshold=best_threshold, AE_model=Trained_AE_model, classify_model=Trained_classify_model, label_embeddings_path=label_embeddings_path)
+            f.write(f"Accuracy: {accuracy:.4f} Precision: {precision:.4f} Recall: {recall:.4f} F1 Score: {f1:.4f}\n")
+    # # all
+    # seen_attack_name = ['DDoS_HOIC', 'DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_GoldenEye',
+    #                     'BruteForce-XSS', 'BruteForce-Web', 'SQL-Injection', 'BruteForce-FTP', 'Infiltration', 'Botnet']
+    # unseen_attack_name = ['DoS_Hulk', 'BruteForce-SSH']
+
+    # # DDoS and DoS attacks
+    # seen_attack_name = ['DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_GoldenEye']
+    # unseen_attack_name = ['DDoS_HOIC', 'DoS_Hulk']
 
     # # Web attacks
     # seen_attack_name = ['BruteForce-XSS', 'BruteForce-Web']
@@ -352,12 +404,3 @@ if __name__ == '__main__':
     # # System intrusion attacks
     # seen_attack_name = ['BruteForce-SSH', 'Infiltration', 'Botnet']
     # unseen_attack_name = ['BruteForce-FTP']
-    
-    seen_attack_df, unseen_attack_df = read_data(csv_file_path, seen_attack_name, unseen_attack_name)
-    seen_attack_df_AE = seen_attack_df.copy()
-    seen_attack_df_eval = seen_attack_df.copy()
-    unseen_attack_df_eval = unseen_attack_df.copy()
-
-    AE_model, best_threshold = train_AE(seen_attack_df, unseen_attack_df, AE_num_epochs, AE_batch_size, AE_model="DeepAutoEncoder")      
-    classify_model = train_classifier(seen_attack_df_AE, classify_model="SimpleMLP", seen_attack_list=seen_attack_name, label_embeddings_path=label_embeddings_path, num_epochs=classify_num_epochs)
-    evaluate(seen_attack_df_eval, unseen_attack_df_eval, threshold=best_threshold, AE_model=AE_model, classify_model=classify_model, label_embeddings_path=label_embeddings_path)

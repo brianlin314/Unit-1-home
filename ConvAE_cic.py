@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 import random
 import joblib
 import math
-from model import DeepAutoEncoder
+from model import DeepAutoEncoder, ConvAutoencoder
 
 from sklearn.metrics import roc_curve
 
@@ -75,15 +75,15 @@ def train(seen_df, unseen_df,  num_epochs, batch_size, evaluate=False):
     X_combined_test = np.concatenate([X_test, X_unseen], axis=0)
     y_combined_test = np.concatenate([y_test, y_unseen], axis=0)
 
-    X_train = torch.tensor(X.values, dtype=torch.float32)
-    X_test = torch.tensor(X_test.values, dtype=torch.float32)
-    X_test_mixed = torch.tensor(X_combined_test, dtype=torch.float32)
-    X_test_unseen = torch.tensor(X_unseen.values, dtype=torch.float32)
+    X_train = torch.tensor(X.to_numpy().reshape(-1, 1, 78), dtype=torch.float32)
+    X_test = torch.tensor(X_test.to_numpy().reshape(-1, 1, 78), dtype=torch.float32)
+    X_test_mixed = torch.tensor(X_combined_test.reshape(-1, 1, 78), dtype=torch.float32)
+    X_test_unseen = torch.tensor(X_unseen.to_numpy().reshape(-1, 1, 78), dtype=torch.float32)
 
 
     EPOCHS = num_epochs
     BATCH_SIZE = batch_size
-    model = DeepAutoEncoder(X_train.shape[1])
+    model = ConvAutoencoder()
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     train_loader = DataLoader(X_train, batch_size=BATCH_SIZE, shuffle=True)
@@ -124,25 +124,23 @@ def train(seen_df, unseen_df,  num_epochs, batch_size, evaluate=False):
             for data in test_loader_mixed:
                 data = data.to(device)
                 outputs = model(data)
-                error = torch.mean(torch.square(outputs - data), dim=1)
+                error = torch.mean((outputs - data) ** 2, dim=[1, 2])
                 reconstruction_errors_mixed.extend(error.cpu().numpy())
 
             # pure test data 
             for data in test_loader:
                 data = data.to(device)
                 outputs = model(data)
-                error = torch.mean(torch.square(outputs - data), dim=1)
+                error = torch.mean((outputs - data) ** 2, dim=[1, 2])
                 reconstruction_errors.extend(error.cpu().numpy())
 
             # all unseen data
             for data in test_loader_unseen:
                 data = data.to(device)
                 outputs = model(data)
-                error = torch.mean(torch.square(outputs - data), dim=1)
+                error = torch.mean((outputs - data) ** 2, dim=[1, 2])
                 reconstruction_errors_unseen.extend(error.cpu().numpy())
-        
-
-
+  
         fpr, tpr, thresholds = roc_curve(y_combined_test, reconstruction_errors_mixed)
         gmeans = np.sqrt(tpr * (1-fpr))
         ix = np.argmax(gmeans)

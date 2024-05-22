@@ -1,0 +1,182 @@
+unseen attacks: ['DDoS_LOIC-HTTP', 'DDoS_HOIC']
+Accuracy: 0.7350 Precision: 0.8512 Recall: 0.7350 F1 Score: 0.6537
+unseen attacks: ['DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP']
+Accuracy: 0.7350 Precision: 0.8026 Recall: 0.7350 F1 Score: 0.6609
+unseen attacks: ['DDoS_LOIC-HTTP', 'DoS_SlowHTTPTest']
+Accuracy: 0.5607 Precision: 0.5493 Recall: 0.5607 F1 Score: 0.4721
+unseen attacks: ['DDoS_LOIC-HTTP', 'DoS_Slowloris']
+Accuracy: 0.7409 Precision: 0.8539 Recall: 0.7409 F1 Score: 0.6664
+unseen attacks: ['DDoS_LOIC-HTTP', 'DoS_Hulk']
+Accuracy: 0.6639 Precision: 0.6425 Recall: 0.6639 F1 Score: 0.5908
+unseen attacks: ['DDoS_LOIC-HTTP', 'DoS_GoldenEye']
+Accuracy: 0.5642 Precision: 0.5366 Recall: 0.5642 F1 Score: 0.5419
+unseen attacks: ['DDoS_LOIC-HTTP', 'BruteForce-XSS']
+Accuracy: 0.8748 Precision: 0.9452 Recall: 0.8748 F1 Score: 0.8922
+unseen attacks: ['DDoS_LOIC-HTTP', 'BruteForce-Web']
+Accuracy: 0.6042 Precision: 0.5869 Recall: 0.6042 F1 Score: 0.5644
+unseen attacks: ['DDoS_LOIC-HTTP', 'SQL-Injection']
+Accuracy: 0.6720 Precision: 0.8196 Recall: 0.6720 F1 Score: 0.6291
+unseen attacks: ['DDoS_LOIC-HTTP', 'BruteForce-SSH']
+Accuracy: 0.6926 Precision: 0.6264 Recall: 0.6926 F1 Score: 0.6363
+unseen attacks: ['DDoS_LOIC-HTTP', 'BruteForce-FTP']
+Accuracy: 0.3722 Precision: 0.4597 Recall: 0.3722 F1 Score: 0.3709
+unseen attacks: ['DDoS_LOIC-HTTP', 'Infiltration']
+Accuracy: 0.5667 Precision: 0.5570 Recall: 0.5667 F1 Score: 0.5556
+unseen attacks: ['DDoS_LOIC-HTTP', 'Botnet']
+Accuracy: 0.7244 Precision: 0.7699 Recall: 0.7244 F1 Score: 0.6494
+unseen attacks: ['DDoS_HOIC', 'DDoS_LOIC-UDP']
+Accuracy: 0.7621 Precision: 0.7927 Recall: 0.7621 F1 Score: 0.7303
+unseen attacks: ['DDoS_HOIC', 'DoS_SlowHTTPTest']
+Accuracy: 0.6408 Precision: 0.6528 Recall: 0.6408 F1 Score: 0.5971
+unseen attacks: ['DDoS_HOIC', 'DoS_Slowloris']
+Accuracy: 0.7173 Precision: 0.6163 Recall: 0.7173 F1 Score: 0.6426
+unseen attacks: ['DDoS_HOIC', 'DoS_Hulk']
+Accuracy: 0.6568 Precision: 0.6137 Recall: 0.6568 F1 Score: 0.5884
+unseen attacks: ['DDoS_HOIC', 'DoS_GoldenEye']
+Accuracy: 0.6938 Precision: 0.6028 Recall: 0.6938 F1 Score: 0.6237
+unseen attacks: ['DDoS_HOIC', 'BruteForce-XSS']
+Accuracy: 0.6137 Precision: 0.6163 Recall: 0.6137 F1 Score: 0.6055
+unseen attacks: ['DDoS_HOIC', 'BruteForce-Web']
+Accuracy: 0.6620 Precision: 0.7227 Recall: 0.6620 F1 Score: 0.6626
+unseen attacks: ['DDoS_HOIC', 'SQL-Injection']
+Accuracy: 0.7376 Precision: 0.8670 Recall: 0.7376 F1 Score: 0.7504
+unseen attacks: ['DDoS_HOIC', 'BruteForce-SSH']
+Accuracy: 0.6584 Precision: 0.6666 Recall: 0.6584 F1 Score: 0.6576
+unseen attacks: ['DDoS_HOIC', 'BruteForce-FTP']
+Accuracy: 0.4888 Precision: 0.5261 Recall: 0.4888 F1 Score: 0.4780
+unseen attacks: ['DDoS_HOIC', 'Infiltration']
+Accuracy: 0.8264 Precision: 0.8859 Recall: 0.8264 F1 Score: 0.8129
+unseen attacks: ['DDoS_HOIC', 'Botnet']
+Accuracy: 0.5618 Precision: 0.5637 Recall: 0.5618 F1 Score: 0.5535
+unseen attacks: ['DDoS_LOIC-UDP', 'DoS_SlowHTTPTest']
+Accuracy: 0.7668 Precision: 0.7530 Recall: 0.7668 F1 Score: 0.7083
+unseen attacks: ['DDoS_LOIC-UDP', 'DoS_Slowloris']
+Accuracy: 0.8422 Precision: 0.8528 Recall: 0.8422 F1 Score: 0.8108
+unseen attacks: ['DDoS_LOIC-UDP', 'DoS_Hulk']
+Accuracy: 0.7807 Precision: 0.7762 Recall: 0.7807 F1 Score: 0.7164
+unseen attacks: ['DDoS_LOIC-UDP', 'DoS_GoldenEye']
+Accuracy: 0.5948 Precision: 0.5991 Recall: 0.5948 F1 Score: 0.5401
+unseen attacks: ['DDoS_LOIC-UDP', 'BruteForce-XSS']
+Accuracy: 0.7605 Precision: 0.8629 Recall: 0.7605 F1 Score: 0.7472
+unseen attacks: ['DDoS_LOIC-UDP', 'BruteForce-Web']
+Accuracy: 0.7574 Precision: 0.8334 Recall: 0.7574 F1 Score: 0.7399
+unseen attacks: ['DDoS_LOIC-UDP', 'SQL-Injection']
+Accuracy: 0.7617 Precision: 0.7788 Recall: 0.7617 F1 Score: 0.7257
+unseen attacks: ['DDoS_LOIC-UDP', 'BruteForce-SSH']
+Accuracy: 0.5995 Precision: 0.5879 Recall: 0.5995 F1 Score: 0.5358
+unseen attacks: ['DDoS_LOIC-UDP', 'BruteForce-FTP']
+Accuracy: 0.5206 Precision: 0.5647 Recall: 0.5206 F1 Score: 0.4414
+unseen attacks: ['DDoS_LOIC-UDP', 'Infiltration']
+Accuracy: 0.6848 Precision: 0.7535 Recall: 0.6848 F1 Score: 0.6477
+unseen attacks: ['DDoS_LOIC-UDP', 'Botnet']
+Accuracy: 0.5771 Precision: 0.5442 Recall: 0.5771 F1 Score: 0.4991
+unseen attacks: ['DoS_SlowHTTPTest', 'DoS_Slowloris']
+Accuracy: 0.7633 Precision: 0.7964 Recall: 0.7633 F1 Score: 0.7196
+unseen attacks: ['DoS_SlowHTTPTest', 'DoS_Hulk']
+Accuracy: 0.8408 Precision: 0.8544 Recall: 0.8408 F1 Score: 0.8015
+unseen attacks: ['DoS_SlowHTTPTest', 'DoS_GoldenEye']
+Accuracy: 0.7220 Precision: 0.6605 Recall: 0.7220 F1 Score: 0.6794
+unseen attacks: ['DoS_SlowHTTPTest', 'BruteForce-XSS']
+Accuracy: 0.4970 Precision: 0.5125 Recall: 0.4970 F1 Score: 0.4619
+unseen attacks: ['DoS_SlowHTTPTest', 'BruteForce-Web']
+Accuracy: 0.4547 Precision: 0.4748 Recall: 0.4547 F1 Score: 0.4156
+unseen attacks: ['DoS_SlowHTTPTest', 'SQL-Injection']
+Accuracy: 0.5154 Precision: 0.5906 Recall: 0.5154 F1 Score: 0.4942
+unseen attacks: ['DoS_SlowHTTPTest', 'BruteForce-SSH']
+Accuracy: 0.4429 Precision: 0.4318 Recall: 0.4429 F1 Score: 0.3857
+unseen attacks: ['DoS_SlowHTTPTest', 'BruteForce-FTP']
+Accuracy: 0.7114 Precision: 0.6151 Recall: 0.7114 F1 Score: 0.6353
+unseen attacks: ['DoS_SlowHTTPTest', 'Infiltration']
+Accuracy: 0.4817 Precision: 0.5251 Recall: 0.4817 F1 Score: 0.4850
+unseen attacks: ['DoS_SlowHTTPTest', 'Botnet']
+Accuracy: 0.3769 Precision: 0.4486 Recall: 0.3769 F1 Score: 0.3822
+unseen attacks: ['DoS_Slowloris', 'DoS_Hulk']
+Accuracy: 0.6675 Precision: 0.6610 Recall: 0.6675 F1 Score: 0.6132
+unseen attacks: ['DoS_Slowloris', 'DoS_GoldenEye']
+Accuracy: 0.8115 Precision: 0.8563 Recall: 0.8115 F1 Score: 0.8030
+unseen attacks: ['DoS_Slowloris', 'BruteForce-XSS']
+Accuracy: 0.8243 Precision: 0.8950 Recall: 0.8243 F1 Score: 0.8208
+unseen attacks: ['DoS_Slowloris', 'BruteForce-Web']
+Accuracy: 0.8009 Precision: 0.9137 Recall: 0.8009 F1 Score: 0.8039
+unseen attacks: ['DoS_Slowloris', 'SQL-Injection']
+Accuracy: 0.9050 Precision: 0.9265 Recall: 0.9050 F1 Score: 0.9081
+unseen attacks: ['DoS_Slowloris', 'BruteForce-SSH']
+Accuracy: 0.7091 Precision: 0.6166 Recall: 0.7091 F1 Score: 0.6395
+unseen attacks: ['DoS_Slowloris', 'BruteForce-FTP']
+Accuracy: 0.6620 Precision: 0.5997 Recall: 0.6620 F1 Score: 0.5959
+unseen attacks: ['DoS_Slowloris', 'Infiltration']
+Accuracy: 0.7875 Precision: 0.8477 Recall: 0.7875 F1 Score: 0.7590
+unseen attacks: ['DoS_Slowloris', 'Botnet']
+Accuracy: 0.7091 Precision: 0.6441 Recall: 0.7091 F1 Score: 0.6406
+unseen attacks: ['DoS_Hulk', 'DoS_GoldenEye']
+Accuracy: 0.7276 Precision: 0.6262 Recall: 0.7276 F1 Score: 0.6521
+unseen attacks: ['DoS_Hulk', 'BruteForce-XSS']
+Accuracy: 0.8215 Precision: 0.8978 Recall: 0.8215 F1 Score: 0.8135
+unseen attacks: ['DoS_Hulk', 'BruteForce-Web']
+Accuracy: 0.8101 Precision: 0.8538 Recall: 0.8101 F1 Score: 0.8038
+unseen attacks: ['DoS_Hulk', 'SQL-Injection']
+Accuracy: 0.7383 Precision: 0.7828 Recall: 0.7383 F1 Score: 0.6933
+unseen attacks: ['DoS_Hulk', 'BruteForce-SSH']
+Accuracy: 0.8090 Precision: 0.8162 Recall: 0.8090 F1 Score: 0.7856
+unseen attacks: ['DoS_Hulk', 'BruteForce-FTP']
+Accuracy: 0.6639 Precision: 0.6029 Recall: 0.6639 F1 Score: 0.5935
+unseen attacks: ['DoS_Hulk', 'Infiltration']
+Accuracy: 0.6994 Precision: 0.7857 Recall: 0.6994 F1 Score: 0.6605
+unseen attacks: ['DoS_Hulk', 'Botnet']
+Accuracy: 0.8479 Precision: 0.8661 Recall: 0.8479 F1 Score: 0.8252
+unseen attacks: ['DoS_GoldenEye', 'BruteForce-XSS']
+Accuracy: 0.8400 Precision: 0.9157 Recall: 0.8400 F1 Score: 0.8508
+unseen attacks: ['DoS_GoldenEye', 'BruteForce-Web']
+Accuracy: 0.7880 Precision: 0.8413 Recall: 0.7880 F1 Score: 0.7947
+unseen attacks: ['DoS_GoldenEye', 'SQL-Injection']
+Accuracy: 0.8835 Precision: 0.9014 Recall: 0.8835 F1 Score: 0.8856
+unseen attacks: ['DoS_GoldenEye', 'BruteForce-SSH']
+Accuracy: 0.7032 Precision: 0.6032 Recall: 0.7032 F1 Score: 0.6309
+unseen attacks: ['DoS_GoldenEye', 'BruteForce-FTP']
+Accuracy: 0.6643 Precision: 0.6013 Recall: 0.6643 F1 Score: 0.5905
+unseen attacks: ['DoS_GoldenEye', 'Infiltration']
+Accuracy: 0.7509 Precision: 0.8457 Recall: 0.7509 F1 Score: 0.7071
+unseen attacks: ['DoS_GoldenEye', 'Botnet']
+Accuracy: 0.6973 Precision: 0.6802 Recall: 0.6973 F1 Score: 0.6336
+unseen attacks: ['BruteForce-XSS', 'BruteForce-Web']
+Accuracy: 0.6847 Precision: 0.6498 Recall: 0.6847 F1 Score: 0.6609
+unseen attacks: ['BruteForce-XSS', 'SQL-Injection']
+Accuracy: 0.6580 Precision: 0.6524 Recall: 0.6580 F1 Score: 0.6346
+unseen attacks: ['BruteForce-XSS', 'BruteForce-SSH']
+Accuracy: 0.8339 Precision: 0.9110 Recall: 0.8339 F1 Score: 0.8296
+unseen attacks: ['BruteForce-XSS', 'BruteForce-FTP']
+Accuracy: 0.4970 Precision: 0.5000 Recall: 0.4970 F1 Score: 0.4693
+unseen attacks: ['BruteForce-XSS', 'Infiltration']
+Accuracy: 0.6957 Precision: 0.8164 Recall: 0.6957 F1 Score: 0.6685
+unseen attacks: ['BruteForce-XSS', 'Botnet']
+Accuracy: 0.9013 Precision: 0.9524 Recall: 0.9013 F1 Score: 0.9096
+unseen attacks: ['BruteForce-Web', 'SQL-Injection']
+Accuracy: 0.7470 Precision: 0.8308 Recall: 0.7470 F1 Score: 0.7658
+unseen attacks: ['BruteForce-Web', 'BruteForce-SSH']
+Accuracy: 0.8163 Precision: 0.8898 Recall: 0.8163 F1 Score: 0.8189
+unseen attacks: ['BruteForce-Web', 'BruteForce-FTP']
+Accuracy: 0.5984 Precision: 0.6673 Recall: 0.5984 F1 Score: 0.5803
+unseen attacks: ['BruteForce-Web', 'Infiltration']
+Accuracy: 0.6328 Precision: 0.7309 Recall: 0.6328 F1 Score: 0.5921
+unseen attacks: ['BruteForce-Web', 'Botnet']
+Accuracy: 0.6113 Precision: 0.5848 Recall: 0.6113 F1 Score: 0.5744
+unseen attacks: ['SQL-Injection', 'BruteForce-SSH']
+Accuracy: 0.8447 Precision: 0.7964 Recall: 0.8447 F1 Score: 0.8099
+unseen attacks: ['SQL-Injection', 'BruteForce-FTP']
+Accuracy: 0.7323 Precision: 0.7400 Recall: 0.7323 F1 Score: 0.6977
+unseen attacks: ['SQL-Injection', 'Infiltration']
+Accuracy: 0.6828 Precision: 0.8582 Recall: 0.6828 F1 Score: 0.6508
+unseen attacks: ['SQL-Injection', 'Botnet']
+Accuracy: 0.6399 Precision: 0.5976 Recall: 0.6399 F1 Score: 0.6016
+unseen attacks: ['BruteForce-SSH', 'BruteForce-FTP']
+Accuracy: 0.6502 Precision: 0.5823 Recall: 0.6502 F1 Score: 0.5828
+unseen attacks: ['BruteForce-SSH', 'Infiltration']
+Accuracy: 0.7414 Precision: 0.8400 Recall: 0.7414 F1 Score: 0.6806
+unseen attacks: ['BruteForce-SSH', 'Botnet']
+Accuracy: 0.8987 Precision: 0.9125 Recall: 0.8987 F1 Score: 0.8973
+unseen attacks: ['BruteForce-FTP', 'Infiltration']
+Accuracy: 0.6777 Precision: 0.7302 Recall: 0.6777 F1 Score: 0.6292
+unseen attacks: ['BruteForce-FTP', 'Botnet']
+Accuracy: 0.4252 Precision: 0.4799 Recall: 0.4252 F1 Score: 0.4283
+unseen attacks: ['Infiltration', 'Botnet']
+Accuracy: 0.7721 Precision: 0.8567 Recall: 0.7721 F1 Score: 0.7341
