@@ -11,7 +11,7 @@ import random
 import joblib
 import math
 from sklearn.metrics import roc_curve
-from model import DeepAutoEncoder, SimpleMLP, CNN_LSTM
+from model import DeepAutoEncoder, SimpleMLP
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, top_k_accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -129,7 +129,7 @@ def train_AE(seen_df, unseen_df, num_epochs=100, batch_size=64, AE_model="DeepAu
             loss += loss.item()
         
         training_loss.append(loss)
-        if epoch % 5 == 0:
+        if (epoch+1) % 5 == 0:
             print(f'Epoch {epoch+1}/{EPOCHS}, Loss: {loss}')
         save_model = '/SSD/p76111262/model_weight/CIC_AE.pth'
         torch.save(model, save_model)
@@ -220,7 +220,7 @@ def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None,
         loss = criterion(outputs, y_train_tensor, torch.ones(len(y_train), dtype=torch.float32)) 
         loss.backward()
         optimizer.step()
-        if epoch % 5 == 0:
+        if (epoch+1) % 5 == 0:
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 
     torch.save(model, '/SSD/p76111262/model_weight/CIC_classifier.pth')
@@ -237,7 +237,10 @@ def train_classifier(seen_df, classify_model="SimpleMLP", seen_attack_list=None,
     print("-------訓練 classifier 完成-------")
     return model
 
-def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model=None, label_embeddings_path=None):
+def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model=None, label_embeddings_path=None, picture_path=None):
+    # if folder not exist, create it
+    if not os.path.exists(f'/SSD/p76111262/ZSL_ConfusionMatrix/{picture_path}'):
+        os.makedirs(f'/SSD/p76111262/ZSL_ConfusionMatrix/{picture_path}')
     seen_attack_list = seen_df['Label'].unique()
     unseen_attack_list = unseen_df['Label'].unique()
     num = len(seen_attack_list)
@@ -326,7 +329,7 @@ def evaluate(seen_df, unseen_df, threshold=0.0001, AE_model=None, classify_model
         plt.xlabel('Predicted Labels')
         plt.ylabel('True Labels')
         plt.title('Confusion Matrix')
-        plt.savefig(f'pictures/{unseen_attack_list[0]}and{unseen_attack_list[1]}.png')
+        plt.savefig(f'/SSD/p76111262/ZSL_ConfusionMatrix/{picture_path}/{unseen_attack_list[0]}-{unseen_attack_list[1]}.png')
 
         return accuracy, precision, recall, f1
 
@@ -352,7 +355,7 @@ if __name__ == '__main__':
     AE_batch_size = 64
     classify_num_epochs = 100
     AE_model = "DeepAutoEncoder"
-    classify_model = "CNN-LSTM"
+    classify_model = "SimpleMLP"
     csv_file_path = '/SSD/p76111262/CIC2018_csv/preprocess_attack.csv'
     label_embeddings_path = '/SSD/p76111262/label_embedding_32'
 
@@ -362,7 +365,7 @@ if __name__ == '__main__':
     ]
     combinations = Permutations(attack_types)
 
-    with open(f"{classify_model}_best_com.txt", 'w') as f:
+    with open(f"Best_Combinations/{classify_model}_best_com.txt", 'w') as f:
         for idx, item in enumerate(combinations):
             seen_attack_name = item['seen_attack_name']
             unseen_attack_name = item['unseen_attack_name']
@@ -375,23 +378,7 @@ if __name__ == '__main__':
             seen_attack_df_eval = seen_attack_df.copy()
             unseen_attack_df_eval = unseen_attack_df.copy()
 
-            AE_model, best_threshold = train_AE(seen_attack_df, unseen_attack_df, AE_num_epochs, AE_batch_size, AE_model=AE_model)      
-            classify_model = train_classifier(seen_attack_df_AE, classify_model=classify_model, seen_attack_list=seen_attack_name, label_embeddings_path=label_embeddings_path, num_epochs=classify_num_epochs)
-            accuracy, precision, recall, f1 = evaluate(seen_attack_df_eval, unseen_attack_df_eval, threshold=best_threshold, AE_model=AE_model, classify_model=classify_model, label_embeddings_path=label_embeddings_path)
+            Trained_AE_model, best_threshold = train_AE(seen_attack_df, unseen_attack_df, AE_num_epochs, AE_batch_size, AE_model=AE_model)      
+            Trained_classify_model = train_classifier(seen_attack_df_AE, classify_model=classify_model, seen_attack_list=seen_attack_name, label_embeddings_path=label_embeddings_path, num_epochs=classify_num_epochs)
+            accuracy, precision, recall, f1 = evaluate(seen_attack_df_eval, unseen_attack_df_eval, threshold=best_threshold, AE_model= Trained_AE_model, classify_model= Trained_classify_model, label_embeddings_path=label_embeddings_path, picture_path=classify_model)
             f.write(f"Accuracy: {accuracy:.4f} Precision: {precision:.4f} Recall: {recall:.4f} F1 Score: {f1:.4f}\n")
-    # # all
-    # seen_attack_name = ['DDoS_HOIC', 'DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_GoldenEye',
-    #                     'BruteForce-XSS', 'BruteForce-Web', 'SQL-Injection', 'BruteForce-FTP', 'Infiltration', 'Botnet']
-    # unseen_attack_name = ['DoS_Hulk', 'BruteForce-SSH']
-
-    # # DDoS and DoS attacks
-    # seen_attack_name = ['DDoS_LOIC-HTTP', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_GoldenEye']
-    # unseen_attack_name = ['DDoS_HOIC', 'DoS_Hulk']
-
-    # # Web attacks
-    # seen_attack_name = ['BruteForce-XSS', 'BruteForce-Web']
-    # unseen_attack_name = ['SQL-Injection']
-
-    # # System intrusion attacks
-    # seen_attack_name = ['BruteForce-SSH', 'Infiltration', 'Botnet']
-    # unseen_attack_name = ['BruteForce-FTP']

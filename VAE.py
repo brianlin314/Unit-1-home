@@ -5,50 +5,11 @@ import torch.nn as nn
 import torch.optim as optim
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
+from model import VAE
 import random
 import joblib
 import math
 from sklearn.metrics import roc_curve
-
-
-class VAE(nn.Module):
-    def __init__(self, input_dim):
-        super(VAE, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Linear(input_dim, 128),
-            nn.ReLU(True),
-            nn.Linear(128, 128 // 2),
-            nn.ReLU(True)
-        )
-        self.fc_mu = nn.Linear(128 // 2, 32)
-        self.fc_logvar = nn.Linear(128 // 2, 32)
-        self.decoder = nn.Sequential(
-            nn.Linear(32, 128 // 2),
-            nn.ReLU(True),
-            nn.Linear(128 // 2, 128),
-            nn.ReLU(True),
-            nn.Linear(128, input_dim),
-            nn.Sigmoid()
-        )
-
-    def encode(self, x):
-        h = self.encoder(x)
-        mu = self.fc_mu(h)
-        logvar = self.fc_logvar(h)
-        return mu, logvar
-
-    def reparameterize(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        eps = torch.randn_like(std)
-        return mu + eps * std
-
-    def decode(self, z):
-        return self.decoder(z)
-
-    def forward(self, x):
-        mu, logvar = self.encode(x)
-        z = self.reparameterize(mu, logvar)
-        return self.decode(z), mu, logvar
 
 def loss_function(recon_x, x, mu, logvar):
     BCE = nn.functional.binary_cross_entropy(recon_x, x, reduction='sum')

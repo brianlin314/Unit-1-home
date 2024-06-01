@@ -48,12 +48,12 @@ for seed in range(51):
     ###################################
     ####    Options of Dataset     ####
     ###################################
-    dataset = 'CIC-IDS2018-v3-DoS' 
+    dataset = 'CIC-IDS2018-v3-Intrusion' 
     modelName = 'Pac3D' 
     saveName = modelName + '-' + dataset
 
     if dataset == 'CIC-IDS2018':
-        num_classes = 13
+        num_classes = 14
     elif dataset == 'CIC-IDS2018-v1-DoS':
         num_classes = 4
     elif dataset == 'CIC-IDS2018-v2-DoS':
@@ -68,6 +68,8 @@ for seed in range(51):
         num_classes = 3
     elif dataset == 'CIC-IDS2018-v3-Other':
         num_classes = 2
+    elif dataset == 'CIC-IDS2018-v3-Intrusion':
+        num_classes = 4
     else:
         print('No Dataset')
         raise NotImplementedError
@@ -179,7 +181,6 @@ for seed in range(51):
             print("[{}] Epoch: {}/{} Loss: {} Acc: {}".format(phase, epoch+1, nEpochs, epoch_loss, epoch_acc))
             stop_time = timeit.default_timer()
 
-            best_performanse_file = f"best_performance/best_performance_{dataset}.txt"
-            if epoch_acc > 0.5:
-                with open(best_performanse_file, 'a') as f:
-                    f.write(f"Seed: {seed} Best Performance: {epoch_acc}\n")
+            best_performanse_file = f"Best_Performance/best_performance_{dataset}.txt"
+            with open(best_performanse_file, 'a') as f:
+                f.write(f"Seed: {seed} Best Performance: {epoch_acc}\n")

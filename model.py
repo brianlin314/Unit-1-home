@@ -58,6 +58,64 @@ class ConvAutoencoder(nn.Module):
         x = self.decoder(x)
         return x
 
+class VAE(nn.Module):
+    def __init__(self, input_dim):
+        super(VAE, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.ReLU(True),
+            nn.Linear(128, 128 // 2),
+            nn.ReLU(True)
+        )
+        self.fc_mu = nn.Linear(128 // 2, 32)
+        self.fc_logvar = nn.Linear(128 // 2, 32)
+        self.decoder = nn.Sequential(
+            nn.Linear(32, 128 // 2),
+            nn.ReLU(True),
+            nn.Linear(128 // 2, 128),
+            nn.ReLU(True),
+            nn.Linear(128, input_dim),
+            nn.Sigmoid()
+        )
+
+    def encode(self, x):
+        h = self.encoder(x)
+        mu = self.fc_mu(h)
+        logvar = self.fc_logvar(h)
+        return mu, logvar
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def decode(self, z):
+        return self.decoder(z)
+
+    def forward(self, x):
+        mu, logvar = self.encode(x)
+        z = self.reparameterize(mu, logvar)
+        return self.decode(z), mu, logvar
+
+class VideoAutoencoder(nn.Module):
+    def __init__(self):
+        super(VideoAutoencoder, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv3d(3, 64, kernel_size=(3, 3, 3), stride=(1, 2, 2), padding=(1, 1, 1)),
+            nn.ReLU(),
+            nn.MaxPool3d((1, 2, 2)),
+        )
+        
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose3d(64, 3, kernel_size=(3, 3, 3), stride=(1, 2, 2), padding=(1, 1, 1)),
+            nn.ReLU(),
+        )
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
+        return x
 
 class SimpleMLP(nn.Module):
     def __init__(self, input_size, output_size):

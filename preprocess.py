@@ -46,4 +46,4 @@ def preprocess(root_dir, output_dir):
         print('Preprocessing finished.')
 
 if __name__ == "__main__":
-    preprocess("/SSD/p76111262/CIC-IDS-2018-v2/BruteForce", "/SSD/p76111262/CIC-IDS2018-v2/BruteForce")
+    preprocess("/SSD/p76111262/CIC-IDS-2018-all", "/SSD/p76111262/CIC-IDS2018-all")

@@ -117,7 +117,7 @@ train_autoencoder(autoencoder, train_data)
 
 embedding = encode_data(autoencoder, train_data)
 
-attack_name = ['DDoS', 'DoS', 'Web', 'Auth', 'Other', 'DDoS_LOIC-HTTP', 'DDoS_HOIC', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_Hulk', 
+attack_name = ['DDoS', 'DoS', 'Web', 'Authentication', 'Advanced', 'DDoS_LOIC-HTTP', 'DDoS_HOIC', 'DDoS_LOIC-UDP', 'DoS_SlowHTTPTest', 'DoS_Slowloris', 'DoS_Hulk', 
                'DoS_GoldenEye', 'BruteForce-XSS', 'BruteForce-Web', 'SQL-Injection', 
                'BruteForce-SSH', 'BruteForce-FTP', 'Infiltration', 'Botnet']
 
