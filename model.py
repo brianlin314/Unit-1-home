@@ -97,19 +97,24 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
-class VideoAutoencoder(nn.Module):
+class Con2DAutoencoder(nn.Module):
     def __init__(self):
-        super(VideoAutoencoder, self).__init__()
+        super(Con2DAutoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Conv3d(3, 64, kernel_size=(3, 3, 3), stride=(1, 2, 2), padding=(1, 1, 1)),
+            nn.Conv2d(4, 16, 3, stride=2, padding=1),
             nn.ReLU(),
-            nn.MaxPool3d((1, 2, 2)),
+            nn.Conv2d(16, 32, 3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 3, stride=2, padding=1),
+            nn.ReLU()
         )
-        
-        # Decoder
         self.decoder = nn.Sequential(
-            nn.ConvTranspose3d(64, 3, kernel_size=(3, 3, 3), stride=(1, 2, 2), padding=(1, 1, 1)),
+            nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1),
             nn.ReLU(),
+            nn.ConvTranspose2d(32, 16, 3, stride=2, padding=1, output_padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(16, 4, 3, stride=2, padding=1, output_padding=1),  # 将输出通道数修改为 4
+            nn.Sigmoid() 
         )
 
     def forward(self, x):

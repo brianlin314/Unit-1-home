@@ -2,77 +2,84 @@ class Path(object):
     @staticmethod
     def db_dir(database):
         if database == 'CIC-IDS2018-v1-DoS':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v1/DoS'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v1/DoS'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-all'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-all'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v2-DoS':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v2/DoS'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v2/DoS'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-DoS':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/DoS'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/DoS'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-DDoS':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/DDoS'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/DDoS'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-Auth':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/Auth'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/Auth'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-Web':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/Web'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/Web'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-Other':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/Other'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/Other'
-
+            
             return root_dir, output_dir
+
         elif database == 'CIC-IDS2018-v3-Intrusion':
-            # folder that contains class labels
             root_dir = '/SSD/p76111262/CIC-IDS-2018-v3/Intrusion'
-
-            # Save preprocess data into output_dir
             output_dir = '/SSD/p76111262/CIC-IDS2018-v3/Intrusion'
-
+            
             return root_dir, output_dir
+
+        elif database == 'CIC-IDS2018-ZSL-DDoS':
+            output_dir = '/SSD/p76111262/CIC-IDS2018-ZSL/DDoS'
+
+            return None, output_dir
+
+        elif database == 'CIC-IDS2018-ZSL-DoS':
+            output_dir = '/SSD/p76111262/CIC-IDS2018-ZSL/DoS'
+
+            return None, output_dir
+
+        elif database == 'CIC-IDS2018-ZSL-Auth':
+            output_dir = '/SSD/p76111262/CIC-IDS2018-ZSL/Auth'
+
+            return None, output_dir
+
+        elif database == 'CIC-IDS2018-ZSL-Web':
+            output_dir = '/SSD/p76111262/CIC-IDS2018-ZSL/Web'
+
+            return None, output_dir
+
+        elif database == 'CIC-IDS2018-ZSL-Other':
+            output_dir = '/SSD/p76111262/CIC-IDS2018-ZSL/Other'
+            
+            return None, output_dir
+
         else:
             print('Database {} not available.'.format(database))
             raise NotImplementedError
