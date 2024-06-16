@@ -1,4 +1,3 @@
 DoS_SlowHTTPTest
-DoS_Slowloris
 DoS_Hulk
 DoS_GoldenEye

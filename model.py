@@ -97,24 +97,30 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
-class Con2DAutoencoder(nn.Module):
+class Conv2DAutoencoder(nn.Module):
     def __init__(self):
-        super(Con2DAutoencoder, self).__init__()
+        super(Conv2DAutoencoder, self).__init__()
         self.encoder = nn.Sequential(
-            nn.Conv2d(4, 16, 3, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(16, 32, 3, stride=2, padding=1),
+            nn.Conv2d(4, 32, 3, stride=2, padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.Conv2d(32, 64, 3, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, 3, stride=2, padding=1),
+            nn.BatchNorm2d(128),
             nn.ReLU()
         )
         self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
             nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 16, 3, stride=2, padding=1, output_padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(16, 4, 3, stride=2, padding=1, output_padding=1),  # 将输出通道数修改为 4
-            nn.Sigmoid() 
+            nn.ConvTranspose2d(32, 4, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(4),
+            nn.Sigmoid()
         )
 
     def forward(self, x):
