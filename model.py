@@ -97,6 +97,37 @@ class VAE(nn.Module):
         z = self.reparameterize(mu, logvar)
         return self.decode(z), mu, logvar
 
+class Conv2DAutoencoder_v1(nn.Module):
+    def __init__(self):
+        super(Conv2DAutoencoder_v1, self).__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 32, 3, stride=2, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 3, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, 3, stride=2, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU()
+        )
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 1, 3, stride=2, padding=1, output_padding=1),
+            nn.BatchNorm2d(1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        x = self.encoder(x)
+        x = self.decoder(x)
+        return x
+
 class Conv2DAutoencoder(nn.Module):
     def __init__(self):
         super(Conv2DAutoencoder, self).__init__()
@@ -127,7 +158,7 @@ class Conv2DAutoencoder(nn.Module):
         x = self.encoder(x)
         x = self.decoder(x)
         return x
-
+    
 class SimpleMLP(nn.Module):
     def __init__(self, input_size, output_size):
         super(SimpleMLP, self).__init__()

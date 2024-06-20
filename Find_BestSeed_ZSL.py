@@ -45,27 +45,27 @@ def get_seen_unseen_classes(domain, seed_num):
 
     if domain == 'DoS':
         set_seed(seed_num)
-        dataset = 'CIC-IDS2018-ZSL-DoS'
+        dataset = 'CIC-IDS2018-ZSL-v1-DoS'
         attack_list = ['DoS_SlowHTTPTest', 'DoS_Hulk', 'DoS_GoldenEye']
 
     elif domain == 'DDoS':
         set_seed(seed_num)
-        dataset = 'CIC-IDS2018-ZSL-DDoS'
+        dataset = 'CIC-IDS2018-ZSL-v1-DDoS'
         attack_list = ['DDoS_LOIC-HTTP', 'DDoS_HOIC'] 
 
     elif domain == 'Auth':
         set_seed(seed_num)
-        dataset = 'CIC-IDS2018-ZSL-Auth'
+        dataset = 'CIC-IDS2018-ZSL-v1-Auth'
         attack_list = ['BruteForce-SSH']
 
     elif domain == 'Web':
         set_seed(seed_num)
-        dataset = 'CIC-IDS2018-ZSL-Web'
+        dataset = 'CIC-IDS2018-ZSL-v1-Web'
         attack_list = ['BruteForce-XSS', 'BruteForce-Web']
 
     elif domain == 'Other':
         set_seed(seed_num)
-        dataset = 'CIC-IDS2018-ZSL-Web'
+        dataset = 'CIC-IDS2018-ZSL-v1-Web'
         attack_list = ['Botnet']
 
     print("Domain:", domain)
@@ -89,7 +89,7 @@ def train_classify(seed_num, device, dataset, vector_lists, attack_lists):
 
     # 載入資料集
     print('Training model on {} dataset...'.format(dataset))
-    train_dataloader = DataLoader(VideoDataset(dataset=dataset, split='train', clip_len=clip_len, embedding_map=vector_lists, attack_list=attack_lists), batch_size=4, shuffle=True, num_workers=0)
+    train_dataloader = DataLoader(VideoDataset(dataset=dataset, split='train', clip_len=clip_len, embedding_map=vector_lists, seen_list=attack_lists, unseen_list=None), batch_size=4, shuffle=True, num_workers=0)
     train_size = len(train_dataloader.dataset)
     vector_map_tensors = [torch.tensor(vector, dtype=torch.float32) for vector in vector_lists]
     vector_map_tensor = torch.stack(vector_map_tensors).to(device)
@@ -148,7 +148,7 @@ if "__main__" == __name__:
     save_epoch = 10 # Store a model every save_epoch
     lr = 1e-3 # Learning rate
     clip_len = 256 # frames of each video
-    domain = 'DoS' # DoS, DDoS, Auth, Web, Other 
+    domain = 'DDoS' # DoS, DDoS, Auth, Web, Other 
     
     for i in range(0, 51):
         print("training_seed:", i)

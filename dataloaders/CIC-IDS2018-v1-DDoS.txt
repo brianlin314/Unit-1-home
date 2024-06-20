@@ -1,0 +1,3 @@
+DDOS_attack-HOIC
+DDOS_attack-LOIC-UDP
+DDoS_attacks-LOIC-HTTP

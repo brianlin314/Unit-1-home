@@ -1,0 +1,14 @@
+Botnet
+BruteForce-FTP
+BruteForce-SSH
+BruteForce-Web
+BruteForce-XSS
+DDoS_HOIC
+DDoS_LOIC-HTTP
+DDoS_LOIC-UDP
+DoS_GoldenEye
+DoS_Hulk
+DoS_SlowHTTPTest
+DoS_Slowloris
+Infiltration
+SQL_Injection

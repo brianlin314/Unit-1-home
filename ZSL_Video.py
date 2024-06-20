@@ -23,7 +23,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from PIL import Image
 
-from model import Conv2DAutoencoder
+from model import Conv2DAutoencoder, Conv2DAutoencoder_v1
 from dataloaders.dataset_ZSL import VideoDataset, ImageDataset, VideoImageDataset
 from network import Pac3D_ZSL_model
 
@@ -50,15 +50,25 @@ def find_optimal_threshold(y_true, y_scores):
     optimal_threshold = thresholds[optimal_idx]
     return optimal_threshold
 
-def get_datalaoder(domain, dataset, seen_vector_map, seen_and_unseen_vector_map, seen_lists, unseen_lists, clip_len=256):
-    transform = transforms.Compose([
-        transforms.Resize((128, 128)),
-        transforms.ToTensor(),
-    ])
+def get_datalaoder(domain, dataset, seen_vector_map, seen_and_unseen_vector_map, seen_lists, unseen_lists, video_type, clip_len=256):
+    print("video_type:", video_type)
+    if video_type == "v1":
+        transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        dataset_path = "CIC-IDS2018-ZSL-v1"
+    elif video_type == "v3":
+        transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        dataset_path = "CIC-IDS2018-ZSL"
 
     # Load dataset
-    AE_train_dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL/{domain}/train', transform=transform, unseen_class=unseen_lists)
-    AE_test_dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL/{domain}/test', transform=transform, unseen_class=unseen_lists)
+    AE_train_dataset = ImageDataset(root_dir=f'/SSD/p76111262/{dataset_path}/{domain}/train', transform=transform, unseen_class=unseen_lists)
+    AE_test_dataset = ImageDataset(root_dir=f'/SSD/p76111262/{dataset_path}/{domain}/test', transform=transform, unseen_class=unseen_lists)
     print(f'AE Number of train images: {len(AE_train_dataset)}')
     print(f'AE Number of test images: {len(AE_test_dataset)}')
     AE_train_dataloader = DataLoader(AE_train_dataset, batch_size=10, shuffle=True)
@@ -70,7 +80,7 @@ def get_datalaoder(domain, dataset, seen_vector_map, seen_and_unseen_vector_map,
     
     if len(Classify_test_dataloader) == len(AE_test_dataloader):
         print("test dataloader correct length")
-    ZSL_test_dataloader =  DataLoader(VideoImageDataset(root=f'/SSD/p76111262/CIC-IDS2018-ZSL/{domain}/test', clip_len=clip_len, embedding_map=seen_and_unseen_vector_map, seen_list=seen_lists, unseen_list=unseen_lists, transform=transform), batch_size=1, shuffle=False, num_workers=0)
+    ZSL_test_dataloader =  DataLoader(VideoImageDataset(root=f'/SSD/p76111262/{dataset_path}/{domain}/test', clip_len=clip_len, embedding_map=seen_and_unseen_vector_map, seen_list=seen_lists, unseen_list=unseen_lists, transform=transform), batch_size=1, shuffle=False, num_workers=0)
     return AE_train_dataloader, AE_test_dataloader, AE_test_dataloader2, Classify_train_dataloader, Classify_test_dataloader, ZSL_test_dataloader
 
 # Define the test function with accuracy calculation
@@ -104,9 +114,12 @@ def AE_test(model, dataloader):
     print(f'Test Loss: {average_loss:.4f}, Accuracy: {accuracy:.4f}, Optimal Threshold: {optimal_threshold:.5f}')
     return optimal_threshold
 
-def AE_train(device, dataloader, seed):
+def AE_train(device, dataloader, seed, video_type=None):
     set_seed(seed)
-    model = Conv2DAutoencoder().to(device)
+    if video_type == "v1":
+        model = Conv2DAutoencoder_v1().to(device)
+    elif video_type == "v3":
+        model = Conv2DAutoencoder().to(device)
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     num_epochs = 30
@@ -128,44 +141,69 @@ def AE_train(device, dataloader, seed):
 
     return model
 
-def get_domain_seen_unseen_classes(domain):
+def get_domain_seen_unseen_classes(domain, video_type=None):
     embedding_path = '/SSD/p76111262/label_embedding_32'
     seen_vector_map = []
     unseen_vector_map = []
     seen_and_unseen_vector_map = []
 
     if domain == 'DoS':
-        classify_seed = 17
-        AE_seed = 50
-        dataset = 'CIC-IDS2018-ZSL-DoS'
+        if video_type == "v3":
+            classify_seed = 17
+            AE_seed = 50
+            dataset = 'CIC-IDS2018-ZSL-DoS'
+        elif video_type == "v1":
+            classify_seed = 49
+            AE_seed = 15
+            dataset = 'CIC-IDS2018-ZSL-v1-DoS'
         seen = ['DoS_SlowHTTPTest', 'DoS_Hulk', 'DoS_GoldenEye']
         unseen = ['DoS_Slowloris']
 
     elif domain == 'DDoS':
-        classify_seed = 17
-        AE_seed = 6
-        dataset = 'CIC-IDS2018-ZSL-DDoS'
+        if video_type == "v3":
+            classify_seed = 17
+            AE_seed = 6
+            dataset = 'CIC-IDS2018-ZSL-DDoS'
+        elif video_type == "v1":
+            classify_seed = 45
+            AE_seed = 33
+            dataset = 'CIC-IDS2018-ZSL-v1-DDoS'
         seen = ['DDoS_LOIC-HTTP', 'DDoS_HOIC'] 
         unseen = ['DDoS_LOIC-UDP']
 
     elif domain == 'Auth':
-        classify_seed = 42
-        AE_seed = 26
-        dataset = 'CIC-IDS2018-ZSL-Auth'
+        if video_type == "v3":
+            classify_seed = 42
+            AE_seed = 26
+            dataset = 'CIC-IDS2018-ZSL-Auth'
+        elif video_type == "v1":
+            classify_seed = 42
+            AE_seed = 21
+            dataset = 'CIC-IDS2018-ZSL-v1-Auth'
         seen = ['BruteForce-SSH']
         unseen =  ['BruteForce-FTP']
 
     elif domain == 'Web':
-        classify_seed = 22
-        AE_seed = 1
-        dataset = 'CIC-IDS2018-ZSL-Web'
+        if video_type == "v3":
+            classify_seed = 22
+            AE_seed = 1
+            dataset = 'CIC-IDS2018-ZSL-Web'
+        elif video_type == "v1":
+            classify_seed = 16
+            AE_seed = 5
+            dataset = 'CIC-IDS2018-ZSL-v1-Web'
         seen = ['BruteForce-XSS', 'BruteForce-Web']
         unseen = ['SQL_Injection']
 
     elif domain == 'Other':
-        classify_seed = 42
-        AE_seed = 29
-        dataset = 'CIC-IDS2018-ZSL-Other'
+        if video_type == "v3":
+            classify_seed = 42
+            AE_seed = 29
+            dataset = 'CIC-IDS2018-ZSL-Other'
+        elif video_type == "v1":
+            classify_seed = 42
+            AE_seed = 36
+            dataset = 'CIC-IDS2018-ZSL-v1-Other'
         seen = ['Botnet']
         unseen = ['Infiltration']
 
@@ -302,10 +340,12 @@ if "__main__" == __name__:
     nEpochs = 10  # Number of epochs for training
     resume_epoch = 0  # Default is 0, change if want to resume
     clip_len = 256 # frames of each video
-    domain = 'DDoS' # DoS, DDoS, Auth, Web, Other 
-    dataset, seen, unseen, seen_vector_map, unseen_vector_map, seen_and_unseen_vector_map, classify_seed, AE_seed = get_domain_seen_unseen_classes(domain=domain)
-    AE_train_dataloader, AE_test_dataloader, AE_test_dataloader2, Classify_train_dataloader, Classify_test_dataloader, ZSL_test_dataloader = get_datalaoder(domain=domain, dataset=dataset, seen_vector_map=seen_vector_map, seen_and_unseen_vector_map=seen_and_unseen_vector_map, seen_lists=seen, unseen_lists=unseen, clip_len=clip_len)
-    AE_model = AE_train(device, AE_train_dataloader, seed=AE_seed)
+    domain = 'Web' # DoS, DDoS, Auth, Web, Other 
+    video_type = "v1"
+    dataset, seen, unseen, seen_vector_map, unseen_vector_map, seen_and_unseen_vector_map, classify_seed, AE_seed = get_domain_seen_unseen_classes(domain=domain, video_type=video_type)
+    print("training ZSL with dataset:", dataset)
+    AE_train_dataloader, AE_test_dataloader, AE_test_dataloader2, Classify_train_dataloader, Classify_test_dataloader, ZSL_test_dataloader = get_datalaoder(domain=domain, dataset=dataset, seen_vector_map=seen_vector_map, seen_and_unseen_vector_map=seen_and_unseen_vector_map, seen_lists=seen, unseen_lists=unseen, video_type=video_type, clip_len=clip_len)
+    AE_model = AE_train(device, AE_train_dataloader, seed=AE_seed, video_type=video_type)
     optimal_threshold = AE_test(model=AE_model, dataloader=AE_test_dataloader2)
     Classify_model = train_classify(device=device, dataloader=Classify_train_dataloader, vector_lists=seen_vector_map, seed=classify_seed)
     y_true, y_pred = ZSL_test(Classify_dataloader=Classify_test_dataloader, AE_dataloader=AE_test_dataloader, ZSL_test_dataloader=ZSL_test_dataloader, seen_vector_map=seen_vector_map, unseen_vector_map=unseen_vector_map, Classify_model=Classify_model, AE_model=AE_model, device=device, optimal_threshold=optimal_threshold)
@@ -314,7 +354,7 @@ if "__main__" == __name__:
     list = []
     for i in range(len(labels)):
         list.append(i)
-
+    print("training ZSL with dataset:", dataset)
     cm = confusion_matrix(y_true, y_pred, labels=list) 
     print("Confusion Matrix:")
     print(cm)
@@ -323,4 +363,7 @@ if "__main__" == __name__:
     plt.title("Confusion Matrix")
     plt.ylabel('Actual Label')
     plt.xlabel('Predicted Label')
-    plt.savefig(f'{domain}_ZSL_confusion_matrix.png')
+    if video_type == "v1":
+        plt.savefig(f'{domain}_ZSL_confusion_matrix_v1.png')
+    elif video_type == "v3":
+        plt.savefig(f'{domain}_ZSL_confusion_matrix.png')

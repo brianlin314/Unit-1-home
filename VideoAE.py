@@ -11,37 +11,7 @@ import numpy as np
 import re
 from dataloaders.dataset_ZSL import ImageDataset
 import random
-
-class Autoencoder(nn.Module):
-    def __init__(self):
-        super(Autoencoder, self).__init__()
-        self.encoder = nn.Sequential(
-            nn.Conv2d(4, 32, 3, stride=2, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, 3, stride=2, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.Conv2d(64, 128, 3, stride=2, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU()
-        )
-        self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, output_padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, output_padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(),
-            nn.ConvTranspose2d(32, 4, 3, stride=2, padding=1, output_padding=1),
-            nn.BatchNorm2d(4),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        x = self.encoder(x)
-        x = self.decoder(x)
-        return x
+from model import Conv2DAutoencoder, Conv2DAutoencoder_v1
 
 def set_seed(seed):
     random.seed(seed)
@@ -93,18 +63,33 @@ def test(model, dataloader, domain):
     print(f'Test Loss: {average_loss:.4f}, Accuracy: {accuracy:.4f}, Precision: {precision}, Optimal Threshold: {optimal_threshold:.4f}')
 
     # 將預測結果寫入檔案
-    with open(f'Best_Performance/AE_predictions_{domain}.txt', 'a') as f:
+    with open(f'Best_Performance/AE_predictions_v1_{domain}_test.txt', 'a') as f:
         f.write(f'{accuracy:.4f}, {precision}, {optimal_threshold:.4f}\n')
 
 # Set device
+video_type = "v1"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-for domain in ["DoS", "DDoS", "Auth", "Web", "Other"]:
+
+# "DoS", "DDoS", "Auth","Web", "Other"
+for domain in ["Auth"]: 
     print("finding optimal threshold for domain: ", domain) 
     # Define transformations
-    transform = transforms.Compose([
-        transforms.Resize((128, 128)),
-        transforms.ToTensor(),
-    ])
+    if video_type == "v3":
+        transform = transforms.Compose([
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        # Model
+        model = Conv2DAutoencoder().to(device)
+
+    elif video_type == "v1":
+        transform = transforms.Compose([
+            transforms.Grayscale(num_output_channels=1),
+            transforms.Resize((128, 128)),
+            transforms.ToTensor(),
+        ])
+        # Model
+        model = Conv2DAutoencoder_v1().to(device)
 
     if domain == 'DoS':
         unseen_class = ['DoS_Slowloris']
@@ -116,7 +101,7 @@ for domain in ["DoS", "DDoS", "Auth", "Web", "Other"]:
         unseen_class =  ['BruteForce-FTP']
 
     elif domain == 'Web':
-        unseen_class = ['SQL_Injection']
+        unseen_class = ['SQL-Injection']
 
     elif domain == 'Other':
         unseen_class = ['Infiltration']
@@ -124,15 +109,18 @@ for domain in ["DoS", "DDoS", "Auth", "Web", "Other"]:
     for i in range(0, 51):
         set_seed(i)
         # Load dataset
-        dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL/{domain}/train', transform=transform, unseen_class=unseen_class)
-        test_dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL/{domain}/test', transform=transform, unseen_class=unseen_class)
+        dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL-v1/{domain}/train', transform=transform, unseen_class=unseen_class)
+        test_dataset = ImageDataset(root_dir=f'/SSD/p76111262/CIC-IDS2018-ZSL-v1/{domain}/test', transform=transform, unseen_class=unseen_class)
         print(f'Number of train images: {len(dataset)}')
         print(f'Number of test images: {len(test_dataset)}')
         dataloader = DataLoader(dataset, batch_size=10, shuffle=True)
         test_dataloader = DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=False)
 
-        # Model
-        model = Autoencoder().to(device)
+        if video_type == "v3":
+            model = Conv2DAutoencoder().to(device)
+        elif video_type == "v1":
+            model = Conv2DAutoencoder_v1().to(device)
+
         criterion = nn.MSELoss()
         optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
